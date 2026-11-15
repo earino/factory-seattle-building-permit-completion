@@ -15,6 +15,14 @@ configs:
     path: extract/private/holdout.csv
 ---
 
+<!-- dataset-factory:links -->
+**Dataset Factory · v-67a46c698fa813cc**
+
+[Dataset website](https://earino.github.io/factory-seattle-building-permit-completion/versions/v-67a46c698fa813cc/) · [GitHub release](https://github.com/earino/factory-seattle-building-permit-completion/releases/tag/v-67a46c698fa813cc) · [Hugging Face](https://huggingface.co/datasets/earino/factory-seattle-building-permit-completion/tree/v-67a46c698fa813cc) · [Catalogue](https://earino.github.io/dataset-factory-site/)
+
+Artifact: a220e68c960ee6b6aa473f015112be0993353ab3d12f9820c31551164f0ee677
+<!-- /dataset-factory:links -->
+
 # Four-year final-inspection sign-off of newly issued Seattle building permits
 
 Will a newly issued Seattle building permit for a substantive construction project reach final inspection sign-off within four years of issuance?
