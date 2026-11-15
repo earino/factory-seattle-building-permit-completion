@@ -1,0 +1,453 @@
+{
+  "quality": {
+    "name": "seattle-building-permit-completion",
+    "target": "completed_within_48_months",
+    "positive_label": 1,
+    "features": [
+      "permitclass",
+      "permitclassmapped",
+      "permittypedesc",
+      "estprojectcost",
+      "housingunitsadded",
+      "housingunitsremoved",
+      "housingunits",
+      "applied_to_issued_days",
+      "totaldaysplanreview",
+      "numberreviewcycles",
+      "daysoutcorrections",
+      "issue_month_sin",
+      "issue_month_cos",
+      "originalzip",
+      "description_length",
+      "description_stfi",
+      "description_per_plan",
+      "description_apartment",
+      "description_unit",
+      "description_tenant",
+      "description_demolition",
+      "dependentbuilding",
+      "standardplan",
+      "parent_permit_flag",
+      "related_mup_flag"
+    ],
+    "id_columns": [
+      "permitnum"
+    ],
+    "time_column": "issueddate",
+    "carry_columns": [],
+    "label_source_columns": [
+      "completeddate"
+    ],
+    "post_hoc_columns": [
+      "completeddate",
+      "statuscurrent",
+      "expiresdate"
+    ],
+    "high_cardinality_columns": [
+      "permitnum",
+      "issueddate"
+    ],
+    "expected_duplicate_ids": 0,
+    "split_windows": {
+      "train": {
+        "start": "2016-01-01T00:00:00.000",
+        "end": "2019-01-01T00:00:00.000"
+      },
+      "eval": {
+        "start": "2019-01-01T00:00:00.000",
+        "end": "2021-01-01T00:00:00.000"
+      },
+      "holdout": {
+        "start": "2021-01-01T00:00:00.000",
+        "end": "2022-10-01T00:00:00.000"
+      }
+    },
+    "splits": {
+      "train": "public/train.csv",
+      "eval": "public/eval.csv",
+      "holdout": "private/holdout.csv"
+    },
+    "event_key_column": "issueddate",
+    "features_documented_at": "prediction_time",
+    "external_threshold": {
+      "source": "Seattle SDCI task threshold fixed a priori: EstProjectCost at least 50000 nominal USD and a 48 calendar-month completion horizon from IssuedDate.",
+      "unit": "USD",
+      "value": 50000
+    },
+    "measurements": [
+      {
+        "column": "estprojectcost",
+        "frame": "Applicant-declared fair-market construction cost in nominal USD; population floor and feature.",
+        "unit": "USD"
+      },
+      {
+        "column": "completed_within_48_months",
+        "frame": "Binary forward outcome from CompletedDate relative to IssuedDate plus 48 calendar months.",
+        "unit": "binary"
+      }
+    ],
+    "task": {
+      "question": "Will a newly issued Seattle building permit for a substantive construction project reach final inspection sign-off within four years of issuance?",
+      "population": "Every row in the live Socrata snapshot with PermitTypeMapped equal to Building, IssuedDate in the half-open window 2016-01-01 through 2022-10-01, and EstProjectCost at least 50000 nominal USD. Rows with impossible chronology (CompletedDate before IssuedDate, or IssuedDate before AppliedDate when both are present) are excluded as a source data-quality rule per the construction recipe. The unit is the permit as issued; no site-level or contractor-level aggregates are used. The population is fixed by permit type, issuance date and declared cost, not by the label value.",
+      "prediction_time": "The permit IssuedDate, when the permit is issued. Only fields written at submittal, during plan review, or at issuance are used; CompletedDate, StatusCurrent, ExpiresDate and post-issuance revisions are excluded from features. The label is observed retrospectively after the 48-month window.",
+      "usefulness": "The label is a four-year forward final-inspection sign-off that does not exist at issuance. Completion is the majority class (about 76-84 percent depending on cohort; non-completion about 16-24 percent), so the task is to separate the substantial stalling minority from projects that close out. It speaks to construction-pipeline attrition and permit-expiry workload. Because rows are single permits and no prior-permit history is used, the task is retrospective and row-local.",
+      "simple_references": "Majority-class control predicting completed for every row is 76-84 percent accurate depending on cohort. Calendar control uses issuance month only. Identity and structure control uses permit class, permit type and ZIP only. Persistence does not apply: each row is a single issuance event with no prior state inside the row, and prior-permit history is deliberately excluded; the nearest analogue is the class-group base rate already covered by the identity control.",
+      "features": [
+        {
+          "name": "permitclass",
+          "meaning": "Project class recorded on the application: Single Family/Duplex, Commercial, Multifamily, Institutional, Industrial, Vacant Land, or N/A. Categorical and row-local.",
+          "availability": "Present in current snapshot; assumed available at issuance because it is set on the application. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "permitclassmapped",
+          "meaning": "Residential, Non-Residential or N/A roll-up of permit class.",
+          "availability": "Present in current snapshot; assumed available at issuance because it is set on the application. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "permittypedesc",
+          "meaning": "New, Addition/Alteration, Tenant Improvement, Temporary, Change of Use Only - No Construction, Curb Cut, or NONE.",
+          "availability": "Present in current snapshot; assumed available at issuance because it is set on the application. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "estprojectcost",
+          "meaning": "Applicant-declared fair-market construction cost in nominal USD; all included rows have at least 50000 by population definition. Mutable if the project is later modified, so read as current-vintage.",
+          "availability": "Present in current snapshot and non-null for eligible rows by the population floor; assumed available at issuance, with revision risk. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "housingunitsadded",
+          "meaning": "Housing units the project adds; null for many rows and left blank, not zero.",
+          "availability": "Present in current snapshot with substantial missingness; assumed available at issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "housingunitsremoved",
+          "meaning": "Housing units the project removes; null left blank.",
+          "availability": "Present in current snapshot with missingness; assumed available at issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "housingunits",
+          "meaning": "Net housing-unit change for the project; null left blank.",
+          "availability": "Present in current snapshot with missingness; assumed available at issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "applied_to_issued_days",
+          "meaning": "Calendar days from AppliedDate to IssuedDate; null if AppliedDate is missing. Both timestamps are at or before issuance.",
+          "availability": "Derived from source fields present in current snapshot; assumed available at issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "totaldaysplanreview",
+          "meaning": "Total plan-review days recorded by SDCI; frequently null in 2016-era rows and left blank.",
+          "availability": "Present in current snapshot but frequently missing; assumed available before issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "numberreviewcycles",
+          "meaning": "Number of plan-review correction cycles recorded before issuance; null left blank.",
+          "availability": "Present in current snapshot; assumed available before issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "daysoutcorrections",
+          "meaning": "Days the applicant spent outside the city responding to plan-review corrections; missing values left blank.",
+          "availability": "Present in current snapshot with missingness; assumed available before issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "issue_month_sin",
+          "meaning": "Sine of the issuance month, a cyclical calendar encoding known at issuance.",
+          "availability": "Derived from IssuedDate in current snapshot; assumed available at issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "issue_month_cos",
+          "meaning": "Cosine of the issuance month, a cyclical calendar encoding known at issuance.",
+          "availability": "Derived from IssuedDate in current snapshot; assumed available at issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "originalzip",
+          "meaning": "Five-digit project ZIP mapped to the 20 most frequent training-row ZIPs plus other and missing; the top-20 list is fitted on training rows only.",
+          "availability": "Present in current snapshot; mapped using training rows only. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "description_length",
+          "meaning": "Character length of the free-text scope description; null when description is missing.",
+          "availability": "Present in current snapshot; assumed written on the application. Null when missing. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "description_stfi",
+          "meaning": "Binary token for stfi in the scope description; null when description is missing, not zero.",
+          "availability": "Present in current snapshot; assumed written on the application. Null when missing. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "description_per_plan",
+          "meaning": "Binary token for per plan in the scope description; null when description is missing, not zero.",
+          "availability": "Present in current snapshot; assumed written on the application. Null when missing. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "description_apartment",
+          "meaning": "Binary token for apartment in the scope description; null when description is missing, not zero.",
+          "availability": "Present in current snapshot; assumed written on the application. Null when missing. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "description_unit",
+          "meaning": "Binary token for unit in the scope description; null when description is missing, not zero.",
+          "availability": "Present in current snapshot; assumed written on the application. Null when missing. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "description_tenant",
+          "meaning": "Binary token for tenant in the scope description; null when description is missing, not zero.",
+          "availability": "Present in current snapshot; assumed written on the application. Null when missing. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "description_demolition",
+          "meaning": "Binary token for demolition in the scope description; null when description is missing, not zero.",
+          "availability": "Present in current snapshot; assumed written on the application. Null when missing. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "dependentbuilding",
+          "meaning": "Dependent-building indicator recorded at filing; null left blank.",
+          "availability": "Present in current snapshot; assumed available at filing or before issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "standardplan",
+          "meaning": "Pre-approved DADU standard-plan indicator; null left blank.",
+          "availability": "Present in current snapshot; assumed available at filing or before issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "parent_permit_flag",
+          "meaning": "One when ParentPermitNum is present, else zero; a filing-structure indicator.",
+          "availability": "Present in current snapshot; assumed available at filing or before issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        },
+        {
+          "name": "related_mup_flag",
+          "meaning": "One when RelatedMUP is present, else zero; a filing-structure indicator.",
+          "availability": "Present in current snapshot; assumed available at filing or before issuance. No historical availability ledger.",
+          "evidence_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr"
+        }
+      ]
+    },
+    "timing": {
+      "features": {
+        "source_kind": "administrative_record",
+        "period": null,
+        "published_days_after_period_end": null
+      },
+      "observations": [],
+      "prediction_instant": {
+        "kind": "administrative_record",
+        "citation": "Permit IssuedDate is the event time; the Socrata resource is a daily-refreshed current snapshot with no reporting-period publication schedule.",
+        "period": null,
+        "days_after_period_end": null
+      },
+      "row_selection": {
+        "fields": [
+          "permittypemapped",
+          "issueddate",
+          "estprojectcost",
+          "applieddate",
+          "completeddate"
+        ],
+        "rule": "Select Building permits with IssuedDate in [2016-01-01, 2022-10-01) and EstProjectCost at least 50000 nominal USD; exclude rows with impossible chronology (CompletedDate before IssuedDate, or IssuedDate before AppliedDate when both dates are present). This is an event-time eligibility rule with a disclosed data-quality exclusion, not a historical forecasting claim.",
+        "latest_period_used": null
+      }
+    },
+    "evaluation_contract": {
+      "access": "isolated_rows",
+      "cross_row_audit": {
+        "auxiliary_files_review": "Only public/train.csv, public/eval.csv and private/holdout.csv are written; no fixture labels, answer scaffolds or auxiliary evaluation files.",
+        "probes": [],
+        "rationale": "All features are row-local. No cross-row contractor history, prior-permit outcomes or site aggregates are used. Sibling permits may share ParentPermitNum or RelatedMUP, so rows are not strictly independent, but those flags are row-local."
+      },
+      "feature_evidence": {
+        "permitnum": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Stable permit identifier present in fetched rows and checked for uniqueness; used as the row ID.",
+          "status": "verified"
+        },
+        "issueddate": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Permit issuance date present in fetched rows and checked against source examples; used as the event time and split key.",
+          "status": "verified"
+        },
+        "permitclass": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed available at issuance because it is set on the application. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "permitclassmapped": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed available at issuance because it is set on the application. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "permittypedesc": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed available at issuance because it is set on the application. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "estprojectcost": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot and non-null for eligible rows by the population floor; assumed available at issuance, with revision risk. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "housingunitsadded": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot with substantial missingness; assumed available at issuance. Null left blank, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "housingunitsremoved": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot with missingness; assumed available at issuance. Null left blank, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "housingunits": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot with missingness; assumed available at issuance. Null left blank, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "applied_to_issued_days": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Derived from AppliedDate and IssuedDate present in current snapshot; assumed available at issuance. Null when AppliedDate is missing. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "totaldaysplanreview": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot but frequently missing; assumed available before issuance. Null left blank, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "numberreviewcycles": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed available before issuance. Null left blank, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "daysoutcorrections": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot with missingness; assumed available before issuance. Null left blank, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "issue_month_sin": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Derived from IssuedDate in current snapshot; assumed available at issuance. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "issue_month_cos": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Derived from IssuedDate in current snapshot; assumed available at issuance. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "originalzip": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; mapped to the 20 most frequent training-row ZIPs plus other and missing. The top-20 list uses training rows only. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "description_length": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed written on the application. Null when description is missing. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "description_stfi": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed written on the application. Null when description is missing, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "description_per_plan": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed written on the application. Null when description is missing, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "description_apartment": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed written on the application. Null when description is missing, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "description_unit": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed written on the application. Null when description is missing, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "description_tenant": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed written on the application. Null when description is missing, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "description_demolition": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed written on the application. Null when description is missing, not zero. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "dependentbuilding": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed available at filing or before issuance. Null left blank. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "standardplan": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Present in current snapshot; assumed available at filing or before issuance. Null left blank. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "parent_permit_flag": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Presence indicator derived from ParentPermitNum in current snapshot; assumed available at filing or before issuance. No historical availability ledger.",
+          "status": "assumed"
+        },
+        "related_mup_flag": {
+          "source": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+          "availability": "Presence indicator derived from RelatedMUP in current snapshot; assumed available at filing or before issuance. No historical availability ledger.",
+          "status": "assumed"
+        }
+      },
+      "limitations": [
+        "The outcome is an administrative final-inspection completion record, not occupancy or certificate of occupancy. A physically finished project whose final inspection was never logged counts as non-completion.",
+        "A null CompletedDate is documented as generally still under inspection; the frozen task maps null to y=0. This is an evidenced field interpretation, not an assumption that an unknown outcome is negative after the 48-month window.",
+        "The Socrata resource is a live daily-refreshed current snapshot with no immutable archive. Exact population counts are tied to the 2026-11-14 publisher evidence and may fail on a later refresh.",
+        "There is no full-row historical availability ledger. Feature availability at issuance is assumed from field semantics and current-snapshot presence, not proven.",
+        "Plan-review and housing-unit fields have substantial missingness. Missing numeric and token values are left blank, not filled with zero.",
+        "EstProjectCost is mutable and is used both for population eligibility and as a feature, so a few projects may enter the cohort retrospectively after an upward revision.",
+        "Rows may be correlated across sibling permits through ParentPermitNum or RelatedMUP; no site-level independence is claimed.",
+        "The 2021-2022 holdout sits in a different construction-cost and post-pandemic regime than the training years. This is part of the task, not an artefact to remove.",
+        "ExpiresDate is mechanically IssuedDate plus about 18 months and is not used as a feature.",
+        "Same-day CompletedDate values occur; they are kept because the field rule is unambiguous, but they depress the informativeness of the positive class."
+      ],
+      "selection": {
+        "kind": "prediction_time",
+        "evidence": "PermitTypeMapped, IssuedDate and EstProjectCost are fixed before or at issuance. Rows with impossible chronology are removed as a source data-quality rule; no row is selected because its label is positive or negative.",
+        "rule": "Building permits with IssuedDate in [2016-01-01, 2022-10-01) and EstProjectCost at least 50000 nominal USD; exclude CompletedDate before IssuedDate or IssuedDate before AppliedDate when both dates are present."
+      },
+      "training_label_timing": "unverified",
+      "use": "retrospective_research",
+      "vintage": {
+        "evidence": "Live Socrata endpoint; publisher metadata states the snapshot was last updated 2026-11-14 and there is no immutable archive.",
+        "kind": "current_snapshot"
+      }
+    }
+  },
+  "references": {
+    "persistence_column": null,
+    "persistence_direction": 1,
+    "entity_columns": [
+      "permitclass",
+      "permitclassmapped",
+      "permittypedesc",
+      "originalzip"
+    ]
+  },
+  "construction_notes": "The download uses the actual Socrata CSV resource with an explicit column list and a date/cost filter. Permit type is deliberately not filtered in the download so non-Building codes in the date/cost slice are counted and then excluded by the frozen population. The population and label are fixed: Building permits issued in [2016-01-01, 2022-10-01), EstProjectCost at least 50000 nominal USD, y=1 only when CompletedDate is non-null and no later than IssuedDate plus 48 calendar months; null CompletedDate maps to y=0 per the portal documentation that it generally means still under inspection. Impossible chronology rows are dropped per the source construction recipe and their count is returned in a check. Features are row-local; the top-20 ZIP mapping is fitted on training rows only, issue month is encoded as sine and cosine, and missing values remain blank rather than zero. No label-derived rates, prior-permit outcomes, holdout-based feature choices or post-outcome fields are shipped. Checks cover exact publisher population counts, two concrete sample permits, cost-floor and 48-month unit checks, unique permit IDs, binary labels, output headers, split-window integrity and training feature coverage. Missing semantic evidence: there is no full historical availability ledger, only a current snapshot; plan-review fields are frequently missing; exact population checks are tied to the 2026-11-14 publisher evidence and may fail on later source drift. No persistence score column exists because each row is a single issuance event with no prior state inside the row, so references is null with identity columns permitclass, permitclassmapped, permittypedesc and originalzip. Quality descriptions correct the source narrative: completion is the majority class at roughly 76-84 percent and non-completion is the 16-24 percent minority, while the target positive label remains completion within 48 months."
+}

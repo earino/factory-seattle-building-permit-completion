@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "terms_url": "https://www.seattle.gov/documents/Departments/Tech/OpenData/COS_OpenDataPolicy.pdf",
+  "terms_sha256": "964d0b7e54ab522da9c682d6fd38841135f9167d29254f49d9d5cf1151827a96",
+  "documentation_url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+  "documentation_sha256": "820c021328846f3af017e1ed52633cdd79c0c62eb01d25cff9ece18c6d91d168",
+  "quoted_excerpt": "Datasets on the Open Data Portal shall be made available without registration requirement, license requirement or restrictions on their use",
+  "excerpt_found": true,
+  "excerpt_match": "contiguous",
+  "scope": "Captured publisher bytes and quote presence; semantic applicability reviewed separately"
+}

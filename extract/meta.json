@@ -1,0 +1,64 @@
+{
+  "name": "seattle-building-permit-completion",
+  "description": "Will a newly issued Seattle building permit for a substantive construction project reach final inspection sign-off within four years of issuance?",
+  "target": "completed_within_48_months",
+  "positive_label": 1,
+  "id_columns": [
+    "permitnum"
+  ],
+  "columns": [
+    "permitnum",
+    "issueddate",
+    "completed_within_48_months",
+    "permitclass",
+    "permitclassmapped",
+    "permittypedesc",
+    "estprojectcost",
+    "housingunitsadded",
+    "housingunitsremoved",
+    "housingunits",
+    "applied_to_issued_days",
+    "totaldaysplanreview",
+    "numberreviewcycles",
+    "daysoutcorrections",
+    "issue_month_sin",
+    "issue_month_cos",
+    "originalzip",
+    "description_length",
+    "description_stfi",
+    "description_per_plan",
+    "description_apartment",
+    "description_unit",
+    "description_tenant",
+    "description_demolition",
+    "dependentbuilding",
+    "standardplan",
+    "parent_permit_flag",
+    "related_mup_flag"
+  ],
+  "rows": {
+    "train": 11286,
+    "eval": 7135,
+    "holdout": 6326
+  },
+  "positive_rate": {
+    "train": 0.7788410419989368,
+    "eval": 0.7489838822704975,
+    "holdout": 0.7570344609547898
+  },
+  "split": {
+    "train": {
+      "start": "2016-01-01T00:00:00.000",
+      "end": "2019-01-01T00:00:00.000"
+    },
+    "eval": {
+      "start": "2019-01-01T00:00:00.000",
+      "end": "2021-01-01T00:00:00.000"
+    },
+    "holdout": {
+      "start": "2021-01-01T00:00:00.000",
+      "end": "2022-10-01T00:00:00.000"
+    }
+  },
+  "split_description": "Fixed calendar boundaries on IssuedDate, no shuffling: train = 2016-01-01..2018-12-31 (11,289 eligible permits), eval = 2019-01-01..2020-12-31 (7,135), holdout = 2021-01-01..2022-09-30 (6,326). The holdout end date is chosen so the last 48-month label window closes on 2026-09-30, before the 2026-11-14 snapshot. No embargo is applied or needed: every feature is strictly row-local, there are no lags, rolling aggregates or other permits' outcomes, so moving a boundary by a month cannot leak anything."
+}

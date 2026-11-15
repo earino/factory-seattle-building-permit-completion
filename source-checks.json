@@ -1,0 +1,449 @@
+{
+  "checks": [
+    {
+      "check": "source_rows",
+      "observed": 26280,
+      "expected": "at least one row from the Socrata resource",
+      "passed": true
+    },
+    {
+      "check": "source_fields",
+      "observed": [
+        "permitnum",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applieddate",
+        "issueddate",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "originalzip",
+        "description",
+        "dependentbuilding",
+        "standardplan",
+        "parentpermitnum",
+        "relatedmup",
+        "completeddate",
+        "permittypemapped",
+        "statuscurrent"
+      ],
+      "expected": [
+        "permitnum",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applieddate",
+        "issueddate",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "originalzip",
+        "description",
+        "dependentbuilding",
+        "standardplan",
+        "parentpermitnum",
+        "relatedmup",
+        "completeddate",
+        "permittypemapped",
+        "statuscurrent"
+      ],
+      "passed": true
+    },
+    {
+      "check": "excluded_permit_type_codes",
+      "observed": {
+        "Demolition": 1223,
+        "Roof": 248,
+        "Grading": 59
+      },
+      "expected": "non-Building codes may exist in the date/cost slice and are counted, then excluded by the frozen population",
+      "passed": true
+    },
+    {
+      "check": "population_query_count",
+      "observed": 24750,
+      "expected": 24750,
+      "passed": true
+    },
+    {
+      "check": "permit_type_population_by_year",
+      "observed": {
+        "2016": 3841,
+        "2017": 3779,
+        "2018": 3669,
+        "2019": 3981,
+        "2020": 3154,
+        "2021": 3460,
+        "2022": 2866
+      },
+      "expected": {
+        "2016": 3841,
+        "2017": 3779,
+        "2018": 3669,
+        "2019": 3981,
+        "2020": 3154,
+        "2021": 3460,
+        "2022": 2866
+      },
+      "passed": true
+    },
+    {
+      "check": "invalid_chronology_rows",
+      "observed": 3,
+      "expected": "source construction recipe requires dropping CompletedDate before IssuedDate or IssuedDate before AppliedDate; count recorded",
+      "passed": true
+    },
+    {
+      "check": "unique_permitnum",
+      "observed": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "check": "target_binary",
+      "observed": [
+        0,
+        1
+      ],
+      "expected": [
+        0,
+        1
+      ],
+      "passed": true
+    },
+    {
+      "check": "null_completed_negative",
+      "observed": 0,
+      "expected": 0,
+      "passed": true
+    },
+    {
+      "check": "source_sample_6071900",
+      "observed": {
+        "permitclass": "Multifamily",
+        "permittypedesc": "Addition/Alteration",
+        "estprojectcost": 119697.0,
+        "applieddate": "2005-12-20",
+        "issueddate": "2016-01-12",
+        "completeddate": "2016-01-12"
+      },
+      "expected": {
+        "permitclass": "Multifamily",
+        "permittypedesc": "Addition/Alteration",
+        "estprojectcost": 119697.0,
+        "applieddate": "2005-12-20",
+        "issueddate": "2016-01-12",
+        "completeddate": "2016-01-12"
+      },
+      "passed": true
+    },
+    {
+      "check": "source_sample_6352649",
+      "observed": {
+        "permitclass": "Multifamily",
+        "permittypedesc": "New",
+        "estprojectcost": 807103.0,
+        "applieddate": "2013-12-26",
+        "issueddate": "2016-01-07",
+        "completeddate": "2018-09-04"
+      },
+      "expected": {
+        "permitclass": "Multifamily",
+        "permittypedesc": "New",
+        "estprojectcost": 807103.0,
+        "applieddate": "2013-12-26",
+        "issueddate": "2016-01-07",
+        "completeddate": "2018-09-04"
+      },
+      "passed": true
+    },
+    {
+      "check": "unit_cost_floor",
+      "observed": 50000.0,
+      "expected": "at least 50000 nominal USD",
+      "passed": true,
+      "kind": "unit"
+    },
+    {
+      "check": "unit_horizon_48_months",
+      "observed": -2,
+      "expected": "at most 0 days beyond IssuedDate plus 48 calendar months for positive rows",
+      "passed": true,
+      "kind": "unit"
+    },
+    {
+      "check": "train_feature_coverage",
+      "observed": {
+        "permitclass": 11286,
+        "permitclassmapped": 11286,
+        "permittypedesc": 11282,
+        "estprojectcost": 11286,
+        "housingunitsadded": 8173,
+        "housingunitsremoved": 8173,
+        "housingunits": 11286,
+        "applied_to_issued_days": 11285,
+        "totaldaysplanreview": 1566,
+        "numberreviewcycles": 11225,
+        "daysoutcorrections": 11180,
+        "issue_month_sin": 11286,
+        "issue_month_cos": 11286,
+        "originalzip": 11286,
+        "description_length": 11284,
+        "description_stfi": 11284,
+        "description_per_plan": 11284,
+        "description_apartment": 11284,
+        "description_unit": 11284,
+        "description_tenant": 11284,
+        "description_demolition": 11284,
+        "dependentbuilding": 11286,
+        "standardplan": 3758,
+        "parent_permit_flag": 11286,
+        "related_mup_flag": 11286
+      },
+      "expected": "every declared feature has at least one non-null training value",
+      "passed": true
+    },
+    {
+      "check": "no_outcome_feature_leak",
+      "observed": [],
+      "expected": [],
+      "passed": true
+    },
+    {
+      "check": "output_headers_train",
+      "observed": [
+        "permitnum",
+        "issueddate",
+        "completed_within_48_months",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applied_to_issued_days",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "issue_month_sin",
+        "issue_month_cos",
+        "originalzip",
+        "description_length",
+        "description_stfi",
+        "description_per_plan",
+        "description_apartment",
+        "description_unit",
+        "description_tenant",
+        "description_demolition",
+        "dependentbuilding",
+        "standardplan",
+        "parent_permit_flag",
+        "related_mup_flag"
+      ],
+      "expected": [
+        "permitnum",
+        "issueddate",
+        "completed_within_48_months",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applied_to_issued_days",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "issue_month_sin",
+        "issue_month_cos",
+        "originalzip",
+        "description_length",
+        "description_stfi",
+        "description_per_plan",
+        "description_apartment",
+        "description_unit",
+        "description_tenant",
+        "description_demolition",
+        "dependentbuilding",
+        "standardplan",
+        "parent_permit_flag",
+        "related_mup_flag"
+      ],
+      "passed": true
+    },
+    {
+      "check": "output_headers_eval",
+      "observed": [
+        "permitnum",
+        "issueddate",
+        "completed_within_48_months",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applied_to_issued_days",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "issue_month_sin",
+        "issue_month_cos",
+        "originalzip",
+        "description_length",
+        "description_stfi",
+        "description_per_plan",
+        "description_apartment",
+        "description_unit",
+        "description_tenant",
+        "description_demolition",
+        "dependentbuilding",
+        "standardplan",
+        "parent_permit_flag",
+        "related_mup_flag"
+      ],
+      "expected": [
+        "permitnum",
+        "issueddate",
+        "completed_within_48_months",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applied_to_issued_days",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "issue_month_sin",
+        "issue_month_cos",
+        "originalzip",
+        "description_length",
+        "description_stfi",
+        "description_per_plan",
+        "description_apartment",
+        "description_unit",
+        "description_tenant",
+        "description_demolition",
+        "dependentbuilding",
+        "standardplan",
+        "parent_permit_flag",
+        "related_mup_flag"
+      ],
+      "passed": true
+    },
+    {
+      "check": "output_headers_holdout",
+      "observed": [
+        "permitnum",
+        "issueddate",
+        "completed_within_48_months",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applied_to_issued_days",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "issue_month_sin",
+        "issue_month_cos",
+        "originalzip",
+        "description_length",
+        "description_stfi",
+        "description_per_plan",
+        "description_apartment",
+        "description_unit",
+        "description_tenant",
+        "description_demolition",
+        "dependentbuilding",
+        "standardplan",
+        "parent_permit_flag",
+        "related_mup_flag"
+      ],
+      "expected": [
+        "permitnum",
+        "issueddate",
+        "completed_within_48_months",
+        "permitclass",
+        "permitclassmapped",
+        "permittypedesc",
+        "estprojectcost",
+        "housingunitsadded",
+        "housingunitsremoved",
+        "housingunits",
+        "applied_to_issued_days",
+        "totaldaysplanreview",
+        "numberreviewcycles",
+        "daysoutcorrections",
+        "issue_month_sin",
+        "issue_month_cos",
+        "originalzip",
+        "description_length",
+        "description_stfi",
+        "description_per_plan",
+        "description_apartment",
+        "description_unit",
+        "description_tenant",
+        "description_demolition",
+        "dependentbuilding",
+        "standardplan",
+        "parent_permit_flag",
+        "related_mup_flag"
+      ],
+      "passed": true
+    },
+    {
+      "check": "split_counts",
+      "observed": {
+        "train": 11286,
+        "eval": 7135,
+        "holdout": 6326
+      },
+      "expected": "each split nonempty and sum equals eligible after chronology filters; publisher pre-exclusion sizes were 11289/7135/6326",
+      "passed": true
+    },
+    {
+      "check": "split_window_integrity",
+      "observed": {
+        "train": [
+          "2016-01-04",
+          "2018-12-31"
+        ],
+        "eval": [
+          "2019-01-02",
+          "2020-12-31"
+        ],
+        "holdout": [
+          "2021-01-02",
+          "2022-09-30"
+        ]
+      },
+      "expected": "train [2016-01-01, 2019-01-01), eval [2019-01-01, 2021-01-01), holdout [2021-01-01, 2022-10-01)",
+      "passed": true
+    },
+    {
+      "check": "target_rate_sanity",
+      "observed": 0.7788410419989368,
+      "expected": "between 0.50 and 0.95, consistent with completion being the majority class",
+      "passed": true
+    }
+  ]
+}

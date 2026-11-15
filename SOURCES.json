@@ -1,0 +1,23 @@
+{
+  "publisher-terms.snapshot": {
+    "url": "https://www.seattle.gov/documents/Departments/Tech/OpenData/COS_OpenDataPolicy.pdf",
+    "bytes": 130759,
+    "sha256": "964d0b7e54ab522da9c682d6fd38841135f9167d29254f49d9d5cf1151827a96",
+    "retrieved_at_unix": 1794739934.885627,
+    "transport_attempts": 1
+  },
+  "publisher-documentation.snapshot": {
+    "url": "https://data.seattle.gov/Built-Environment/Building-Permits/76t5-zqzr",
+    "bytes": 630711,
+    "sha256": "820c021328846f3af017e1ed52633cdd79c0c62eb01d25cff9ece18c6d91d168",
+    "retrieved_at_unix": 1794739936.7909536,
+    "transport_attempts": 1
+  },
+  "seattle_building_permits_0.csv": {
+    "url": "https://data.seattle.gov/resource/76t5-zqzr.csv?%24select=permitnum%2Cpermitclass%2Cpermitclassmapped%2Cpermittypedesc%2Cestprojectcost%2Chousingunitsadded%2Chousingunitsremoved%2Chousingunits%2Capplieddate%2Cissueddate%2Ctotaldaysplanreview%2Cnumberreviewcycles%2Cdaysoutcorrections%2Coriginalzip%2Cdescription%2Cdependentbuilding%2Cstandardplan%2Cparentpermitnum%2Crelatedmup%2Ccompleteddate%2Cpermittypemapped%2Cstatuscurrent&%24where=issueddate+%3E%3D+%272016-01-01T00%3A00%3A00%27+AND+issueddate+%3C+%272022-10-01T00%3A00%3A00%27+AND+estprojectcost+%3E%3D+50000&%24order=permitnum%2Cissueddate&%24limit=50000&%24offset=0",
+    "bytes": 8817799,
+    "sha256": "0c315333856b811bb3728a48e2a8883da998f8d1e47bebd8c0145111fadd1b20",
+    "retrieved_at_unix": 1794739939.4712708,
+    "transport_attempts": 1
+  }
+}
